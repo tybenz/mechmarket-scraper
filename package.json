@@ -1,0 +1,25 @@
+{
+  "name": "mechmarket",
+  "version": "1.0.0",
+  "description": "Web scraper to check /r/mechmarket for specific items and notify me via SMS",
+  "main": "index.js",
+  "dependencies": {
+    "jsdom-no-contextify": "^3.1.0",
+    "moment": "^2.9.0",
+    "request": "^2.53.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tybenz/mechmarket-scraper.git"
+  },
+  "author": "Tyler Benziger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tybenz/mechmarket-scraper/issues"
+  },
+  "homepage": "https://github.com/tybenz/mechmarket-scraper"
+}
