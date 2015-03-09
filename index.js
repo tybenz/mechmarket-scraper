@@ -2,7 +2,7 @@ var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
 var moment = require( 'moment' );
-var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=day';
+var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=hour';
 if (process.env.REDISTOGO_URL) {
   var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
   var redis = require( 'redis' ).createClient( rtg.port, rtg.hostname );
@@ -21,7 +21,7 @@ redis.get( 'time', function( err, t ) {
   if ( t ) {
     latest = moment( t );
   } else {
-    latest = { hour: -1 };
+    latest = moment( '1970' );
   }
   check();
 });
@@ -35,7 +35,7 @@ var check = function() {
     function( errors, window ) {
       if ( !window.document.querySelector( '#noresults' ) ) {
         console.log( 'FOUND' );
-        if ( latest.hour != now.hour ) {
+        if ( now.diff( latest ) > 3600 * 1000 ) {
           console.log( 'NOTIFYING' );
           notify( logTime );
         } else {
