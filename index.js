@@ -1,6 +1,7 @@
 var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
+var moment = require( 'moment' );
 var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=hour';
 if (process.env.REDISTOGO_URL) {
   var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
