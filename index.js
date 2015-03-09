@@ -2,7 +2,7 @@ var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
 var moment = require( 'moment' );
-var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=hour';
+var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=day';
 if (process.env.REDISTOGO_URL) {
   var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
   var redis = require( 'redis' ).createClient( rtg.port, rtg.hostname );
@@ -41,6 +41,7 @@ var check = function() {
           logTime();
         } else {
           console.log( 'ALREADY NOTIFIED' );
+          exit();
         }
       } else {
         console.log( 'EMPTY' );
@@ -70,9 +71,13 @@ var notify = function() {
 };
 
 var logTime = function() {
-  redis.set( 'time', moment().format() );
+  redis.set( 'time', moment().format(), exit );
 };
 
 var clearTime = function() {
-  redis.set( 'time', '' );
+  redis.set( 'time', '', exit );
+};
+
+var exit = function() {
+  process.exit();
 };
