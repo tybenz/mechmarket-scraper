@@ -37,8 +37,7 @@ var check = function() {
         console.log( 'FOUND' );
         if ( latest.hour != now.hour ) {
           console.log( 'NOTIFYING' );
-          notify();
-          logTime();
+          notify( logTime );
         } else {
           console.log( 'ALREADY NOTIFIED' );
           exit();
@@ -59,7 +58,7 @@ var textBeltResponded = function( err, response ) {
   }
 };
 
-var notify = function() {
+var notify = function( fn ) {
   request({
     method: 'POST',
     url: 'http://textbelt.com/text',
@@ -67,7 +66,10 @@ var notify = function() {
       number: '2096142267',
       message: 'Someone one posted at: ' + searchUrl
     }
-  }, textBeltResponded );
+  }, function( err, response ) {
+    textBeltResponded( err, response );
+    fn();
+  });
 };
 
 var logTime = function() {
