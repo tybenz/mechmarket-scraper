@@ -1,37 +1,53 @@
 var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
-var fs = require( 'fs' );
-var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=day';
-var moment = require( 'moment' );
-var time = fs.readFileSync( __dirname + '/tmp/time.txt', 'utf8' ).replace( /^\s*/, '' ).replace( /\s*$/, '' );
-console.log( time );
-if ( time ) {
-  var latest = moment( time );
-} else {
-  var latest = { hour: -1 };
-}
-var now = moment();
+var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=hour';
+if (process.env.REDISTOGO_URL) {
+  var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
+  var redis = require( 'redis' ).createClient( rtg.port, rtg.hostname );
 
-jsdom.env(
-  searchUrl,
-  [],
-  function( errors, window ) {
-    if ( !window.document.querySelector( '#noresults' ) ) {
-      console.log( 'FOUND' );
-      if ( latest.hour != now.hour ) {
-        console.log( 'NOTIFYING' );
-        notify();
-        logTime();
-      } else {
-        console.log( 'ALREADY NOTIFIED' );
-      }
-    } else {
-      console.log( 'EMPTY' );
-      clearTime();
-    }
+  redis.auth( rtg.auth.split( ':' )[ 1 ] );
+} else {
+  var redis = require( 'redis' ).createClient();
+}
+var latest;
+
+redis.get( 'time', function( err, t ) {
+  if ( err ) {
+    console.log( err );
+    return;
   }
-);
+  if ( t ) {
+    latest = moment( t );
+  } else {
+    latest = { hour: -1 };
+  }
+  check();
+});
+
+var check = function() {
+  var now = moment();
+
+  jsdom.env(
+    searchUrl,
+    [],
+    function( errors, window ) {
+      if ( !window.document.querySelector( '#noresults' ) ) {
+        console.log( 'FOUND' );
+        if ( latest.hour != now.hour ) {
+          console.log( 'NOTIFYING' );
+          notify();
+          logTime();
+        } else {
+          console.log( 'ALREADY NOTIFIED' );
+        }
+      } else {
+        console.log( 'EMPTY' );
+        clearTime();
+      }
+    }
+  );
+};
 
 var textBeltResponded = function( err, response ) {
   try {
@@ -53,9 +69,9 @@ var notify = function() {
 };
 
 var logTime = function() {
-  fs.writeFileSync( __dirname + '/tmp/time.txt', moment().format(), 'utf8' );
+  redis.set( 'time', moment().format() );
 };
 
 var clearTime = function() {
-  fs.writeFileSync( __dirname + '/tmp/time.txt', '', 'utf8' );
+  redis.set( 'time', '' );
 };

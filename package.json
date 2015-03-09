@@ -6,6 +6,7 @@
   "dependencies": {
     "jsdom-no-contextify": "^3.1.0",
     "moment": "^2.9.0",
+    "redis": "^0.12.1",
     "request": "^2.53.0"
   },
   "devDependencies": {},
