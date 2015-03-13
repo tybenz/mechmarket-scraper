@@ -29,17 +29,16 @@ var check = function() {
     searchUrl,
     [],
     function( errors, window ) {
-      var links = window.document.querySelector( '.sitetable.linklisting .entry a.title' );
-      console.log( links );
+      var links = window.document.querySelectorAll( '.sitetable.linklisting .entry a.title' );
       var missing = false;
-      console.log( linkList );
+      console.log( 'BEFORE', linkList );
       linkList = Array.prototype.map.call( links, function( node ) {
-        console.log( node.href );
         if ( linkList.indexOf( node.href ) == -1 ) {
           missing = true;
         }
         return node.href;
       });
+      console.log( 'AFTER', linkList );
 
       if ( missing ) {
         console.log( 'NOTIFYING' );
