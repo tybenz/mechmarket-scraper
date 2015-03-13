@@ -29,7 +29,7 @@ var check = function() {
     searchUrl,
     [],
     function( errors, window ) {
-      var links = window.document.querySelector( '' );
+      var links = window.document.querySelector( '.sitetable.linklisting .entry a.title' );
       var missing = false;
       linkList = Array.prototype.map.call( links, function( node ) {
         if ( linkList.indexOf( node.href ) == -1 ) {
