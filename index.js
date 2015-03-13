@@ -31,7 +31,9 @@ var check = function() {
     function( errors, window ) {
       var links = window.document.querySelector( '.sitetable.linklisting .entry a.title' );
       var missing = false;
+      console.log( linkList );
       linkList = Array.prototype.map.call( links, function( node ) {
+        console.log( node.href );
         if ( linkList.indexOf( node.href ) == -1 ) {
           missing = true;
         }
