@@ -18,7 +18,7 @@ redis.get( 'links', function( err, list ) {
     console.log( err );
     return;
   }
-  linkList = linkList ? JSON.parse( linkList ) : [];
+  linkList = list ? JSON.parse( list ) : [];
   check();
 });
 
