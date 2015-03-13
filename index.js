@@ -30,6 +30,7 @@ var check = function() {
     [],
     function( errors, window ) {
       var links = window.document.querySelector( '.sitetable.linklisting .entry a.title' );
+      console.log( links );
       var missing = false;
       console.log( linkList );
       linkList = Array.prototype.map.call( links, function( node ) {
