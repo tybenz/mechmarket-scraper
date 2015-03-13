@@ -1,7 +1,13 @@
+var moment = require( 'moment' );
+var now = moment().utcOffset( '-0700' );
+if ( now.hour() < 7 || now.hour() > 22 ) {
+  console.log( 'CANCELLED DUE TO TIME OF DAY' );
+  console.log( now.format() );
+  process.exit();
+}
 var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
-var moment = require( 'moment' );
 var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+title%3Agranite&sort=new&restrict_sr=on&t=all';
 if (process.env.REDISTOGO_URL) {
   var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
