@@ -2,7 +2,7 @@ var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
 var moment = require( 'moment' );
-var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=hour';
+var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+title%3Agranite&sort=new&restrict_sr=on&t=all';
 if (process.env.REDISTOGO_URL) {
   var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
   var redis = require( 'redis' ).createClient( rtg.port, rtg.hostname );
@@ -11,18 +11,14 @@ if (process.env.REDISTOGO_URL) {
 } else {
   var redis = require( 'redis' ).createClient();
 }
-var latest;
+var linkList;
 
-redis.get( 'time', function( err, t ) {
+redis.get( 'links', function( err, list ) {
   if ( err ) {
     console.log( err );
     return;
   }
-  if ( t ) {
-    latest = moment( t );
-  } else {
-    latest = moment( '1970' );
-  }
+  linkList = linkList ? JSON.parse( linkList ) : [];
   check();
 });
 
@@ -33,18 +29,21 @@ var check = function() {
     searchUrl,
     [],
     function( errors, window ) {
-      if ( !window.document.querySelector( '#noresults' ) ) {
-        console.log( 'FOUND' );
-        if ( now.diff( latest ) > 3600 * 1000 ) {
-          console.log( 'NOTIFYING' );
-          notify( logTime );
-        } else {
-          console.log( 'ALREADY NOTIFIED' );
-          exit();
+      var links = window.document.querySelector( '' );
+      var missing = false;
+      linkList = Array.prototype.map.call( links, function( node ) {
+        if ( linkList.indexOf( node.href ) == -1 ) {
+          missing = true;
         }
+        return node.href;
+      });
+
+      if ( missing ) {
+        console.log( 'NOTIFYING' );
+        notify( updateList );
       } else {
-        console.log( 'EMPTY' );
-        clearTime();
+        console.log( 'ALREADY NOTIFIED OR LIST EMPTY' );
+        exit();
       }
     }
   );
@@ -72,12 +71,8 @@ var notify = function( fn ) {
   });
 };
 
-var logTime = function() {
-  redis.set( 'time', moment().format(), exit );
-};
-
-var clearTime = function() {
-  redis.set( 'time', '', exit );
+var updateList = function() {
+  redis.set( 'links', JSON.stringify( linkList ), exit );
 };
 
 var exit = function() {
