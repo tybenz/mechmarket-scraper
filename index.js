@@ -8,7 +8,7 @@ if ( now.hour() < 7 || now.hour() > 22 ) {
 var request = require( 'request' );
 var jsdom = require( 'jsdom-no-contextify' );
 var url = require( 'url' );
-var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+title%3Agranite&sort=new&restrict_sr=on&t=all';
+var searchUrl = 'http://www.reddit.com/r/mechmarket/search?q=wts+granite&sort=new&restrict_sr=on&t=all';
 if (process.env.REDISTOGO_URL) {
   var rtg   = require( 'url' ).parse( process.env.REDISTOGO_URL );
   var redis = require( 'redis' ).createClient( rtg.port, rtg.hostname );
